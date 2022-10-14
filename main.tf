@@ -32,8 +32,8 @@ resource "aws_lambda_function" "react_lambda_app" {
 
 /* Lambda iam Role */
 
-resource "aws_iam_role" "blog_app_lambda" {
-  name = "blog_app_lambda"
+resource "aws_iam_role" "blog_app_lambdas" {
+  name = "blog_app_lambdas"
 
   assume_role_policy = <<EOF
 {
@@ -53,18 +53,18 @@ EOF
 }
 
 
-resource "aws_iam_role_policy_attachment" "ba_lambda_attach_2" {
+resource "aws_iam_role_policy_attachment" "ba_lambda_attach_2s" {
   role       = aws_iam_role.blog_app_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccess"
 }
-resource "aws_iam_role_policy_attachment" "ba_lambda_attach_3" {
+resource "aws_iam_role_policy_attachment" "ba_lambda_attach_3s" {
   role       = aws_iam_role.blog_app_lambda.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonAPIGatewayInvokeFullAccess"
 }
 
 
 resource "aws_api_gateway_rest_api" "api" {
-  name = "blog-application"
+  name = "blog-application1"
   endpoint_configuration {
     types = [
       "REGIONAL"
@@ -3096,7 +3096,7 @@ resource "aws_lambda_layer_version" "lambda_layer" {
   compatible_runtimes      = ["python3.9"]
 }
 
-resource "aws_lambda_function" "lambda_ba_data" {
+resource "aws_lambda_function" "lambda_ba_datas" {
   filename      = "modules/module-1/resources/lambda/out/data_app.zip"
   function_name = "blog-application-data"
   handler       = "lambda_function.lambda_handler"
@@ -3116,7 +3116,7 @@ resource "aws_lambda_function" "lambda_ba_data" {
 /* Lambda iam Role */
 
 resource "aws_iam_role" "blog_app_lambda_python" {
-  name = "blog_app_lambda_data"
+  name = "blog_app_lambda_datas"
 
   assume_role_policy = <<EOF
 {
@@ -3272,7 +3272,7 @@ resource "aws_s3_bucket_object" "upload_folder_prod" {
 
 #Development bucket
 resource "aws_s3_bucket" "dev" {
-  bucket        = "dev-blog-awsgoat-bucket-${data.aws_caller_identity.current.account_id}"
+  bucket        = "dev-blog-awsgoat-buckets-${data.aws_caller_identity.current.account_id}"
 
   tags = {
     Name        = "Development bucket"
@@ -3297,7 +3297,7 @@ data "aws_iam_policy_document" "allow_get_list_access" {
   }
 }
 # Upload in dev bucket
-resource "aws_s3_bucket_object" "upload_folder_dev" {
+resource "aws_s3_bucket_object" "upload_folder_devs" {
   for_each     = fileset("./modules/module-1/resources/s3/webfiles/build/", "**")
   bucket       = aws_s3_bucket.dev.bucket
   key          = each.value
@@ -3306,7 +3306,7 @@ resource "aws_s3_bucket_object" "upload_folder_dev" {
   content_type = lookup(local.content_type_map, regex("\\.(?P<extension>[A-Za-z0-9]+)$", each.value).extension, "application/octet-stream")
   depends_on   = [aws_s3_bucket.dev, null_resource.file_replacement_ec2_ip]
 }
-resource "aws_s3_bucket_object" "upload_folder_dev_2" {
+resource "aws_s3_bucket_object" "upload_folder_dev_2s" {
   for_each     = fileset("./modules/module-1/resources/s3/shared/", "**")
   bucket       = aws_s3_bucket.dev.bucket
   key          = each.value
@@ -3319,7 +3319,7 @@ resource "aws_s3_bucket_object" "upload_folder_dev_2" {
 
 
 /* Creating a S3 Bucket for ec2-files upload. */
-resource "aws_s3_bucket" "bucket_temp" {
+resource "aws_s3_bucket" "bucket_temps" {
   bucket        = "ec2-temp-bucket-${data.aws_caller_identity.current.account_id}"
   force_destroy = true
   #   acl = "private"
@@ -3329,7 +3329,7 @@ resource "aws_s3_bucket" "bucket_temp" {
   }
 }
 /* Uploading all files to files-ACCOUNT_ID bucket */
-resource "aws_s3_bucket_object" "upload_temp_object" {
+resource "aws_s3_bucket_object" "upload_temp_objects" {
   for_each     = fileset("./modules/module-1/resources/s3/webfiles/build/", "**")
   acl          = "public-read"
   bucket       = aws_s3_bucket.bucket_temp.bucket
@@ -3338,7 +3338,7 @@ resource "aws_s3_bucket_object" "upload_temp_object" {
   content_type = lookup(local.content_type_map, regex("\\.(?P<extension>[A-Za-z0-9]+)$", each.value).extension, "application/octet-stream")
   depends_on   = [aws_s3_bucket.bucket_upload, null_resource.file_replacement_lambda_react]
 }
-resource "aws_s3_bucket_object" "upload_temp_object_2" {
+resource "aws_s3_bucket_object" "upload_temp_object_2s" {
   for_each     = fileset("./modules/module-1/resources/s3/shared/", "**")
   acl          = "public-read"
   bucket       = aws_s3_bucket.bucket_temp.bucket
@@ -3350,7 +3350,7 @@ resource "aws_s3_bucket_object" "upload_temp_object_2" {
 
 /* Creating a S3 Bucket for Terraform state file upload. */
 resource "aws_s3_bucket" "bucket_tf_files" {
-  bucket        = "do-not-delete-awsgoat-state-files-${data.aws_caller_identity.current.account_id}"
+  bucket        = "do-not-delete-awsgoat-state-filess-${data.aws_caller_identity.current.account_id}"
   force_destroy = true
   tags = {
     Name        = "Do not delete Bucket"
